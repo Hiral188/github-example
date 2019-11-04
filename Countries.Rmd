@@ -1,0 +1,106 @@
+---
+title: "Final_cornell"
+author: "Hiral Parmar"
+date: "11/3/2019"
+output: html_document
+---
+```{r}
+library(dplyr)
+countries <- read_csv('~/Downloads/Datamining/abc.csv')
+View(countries)
+
+
+```
+
+
+```{r}
+
+```
+
+
+
+```{r} 
+#count  total regions
+countries%>%group_by(Region)%>%summarise(count=n())
+```
+
+
+```{r}
+
+# calculate population growth rate
+ppr_countries<-countries%>%mutate(pgr=(Birthrate-Deathrate))
+view(ppr_countries)
+```
+
+```{r}
+#the average Population and growth rate (pgr you just created) per Region.
+ppr_countries%>%group_by(Region)%>%summarise(avg_population=mean(Population), avg_pgr=mean(pgr, na.rm=TRUE))%>%arrange(desc(avg_population))
+#result show that one interesting point BALTICS has more deathrate than birthrate
+```
+
+```{r}
+#measure of centrality and one measure of spread for the Infant.mortality variable.
+countries%>%summarise(mean=mean(Infant.mortality), sd=sd(Infant.mortality))
+hist(countries$Infant.mortality)
+#mean can be afftect by outliers so it's  better to check median 
+median(countries$Infant.mortality)
+```
+
+
+```{r}
+#typical rate of literacy in every region
+#infant mortality rates per Region
+countries%>%grop_by(Region)%>%summarise(Literacy_rate=mean(Literacy, na.rm=TRUE)) 
+
+```
+
+
+```{r}
+#countries 
+abc<-countries%>%mutate(im_to_birth=Infant.mortality/Birthrate)%>%group_by(Region)%>%summarise(median_infant_mortality=median(Infant.mortality),median_Birthrate=median(Birthrate) ,median_im_to_birth=median(im_to_birth))
+view(abc)
+
+
+```
+
+
+```{r}
+ #typical infant mortality for countries where net migration is positive (more immigrants than emigrants) and for countries where net migration is negative (more emigrants than immigrants)
+positive_m=countries%>%filter(Net.migration>0)%>%summarise(mean_infant_mortality=mean(Infant.mortality))
+positive_m
+negative_m=countries%>%filter(Net.migration<0)%>%summarise(mean_infant_mortality=mean(Infant.mortality))
+
+```
+
+
+```{r}
+#typical Infant.mortaliy rates for countries with above-the-median GDP (Gross Domestic Product) and countries with below-the-median GDP. 
+
+m_gdp<-median(countries$GDP, na.rm=TRUE)  #Median Gdp is  5550
+
+countries%>%filter(GDP>5550)%>%summarise(mean=mean(Infant.mortality)) #O/P Aabove the median gdp  is avg infant mortality rate 13.22301	
+
+countries%>%filter(GDP<5550)%>%summarise(mean=mean(Infant.mortality)) # below the median gep avg infant mortality rate O/P is 57.79092
+```
+
+```{r}
+#migration plot
+p<-ggplot(data=countries, aes(x=Infant.mortality, y=Net.migration)) +
+  geom_line(stat="identity")
+p
+
+```
+
+```{r}
+#GDP per  region 
+p1<-ggplot(data=countries, aes(x=GDP, y=Infant.mortality, color=Region)) +
+  geom_line(stat="identity")
+p1
+
+
+
+```
+
+
+
+
